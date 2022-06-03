@@ -7,6 +7,17 @@ locals {
   } 
 
 terraform { 
+  backend "azurerm" { 
+
+     resource_group_name  = "gitopsdemo-tfstates-rg" 
+
+     storage_account_name = "gitopsdemo" 
+
+     container_name       = "gitopsdemotfstates" 
+
+     key                  = "gitopsdemo.tfstate" 
+
+  } 
 
   required_providers { 
 
