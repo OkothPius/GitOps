@@ -1,64 +1,64 @@
-locals { 
+locals {
 
-    location = "uksouth" 
+  location = "uksouth"
 
-    prefix = "gitopsdemo" 
+  prefix = "gitopsdemo"
 
-  } 
+}
 
-terraform { 
-  backend "azurerm" { 
+terraform {
+  backend "azurerm" {
 
-     resource_group_name  = "gitopsdemo-tfstates-rg" 
+    resource_group_name = "gitopsdemo-tfstates-rg"
 
-     storage_account_name = "gitopsdemo" 
+    storage_account_name = "gitopsdemo"
 
-     container_name       = "gitopsdemotfstates" 
+    container_name = "gitopsdemotfstates"
 
-     key                  = "gitopsdemo.tfstate" 
+    key = "gitopsdemo.tfstate"
 
-  } 
+  }
 
-  required_providers { 
+  required_providers {
 
-      azurerm = { 
+    azurerm = {
 
-        source  = "hashicorp/azurerm" 
+      source = "hashicorp/azurerm"
 
-        version = ">=3.0.0" 
+      version = ">=3.0.0"
 
-      } 
+    }
 
-    }   
+  }
 
-} 
+}
 
 
-provider "azurerm" { 
+provider "azurerm" {
 
-  features {} 
+  features {}
 
-} 
+}
 
 resource "azurerm_resource_group" "main" {
 
-  name     = "${local.prefix}-rg"
+  name = "${local.prefix}-rg"
 
   location = local.location
 
-  }
+}
 
 
 
 resource "azurerm_storage_account" "main" {
 
-  name                     = "${local.prefix}storageacct"
+  name = "${local.prefix}storageacct"
 
-  resource_group_name      = azurerm_resource_group.main.name
+  resource_group_name = azurerm_resource_group.main.name
 
-  location                 = azurerm_resource_group.main.location
+  location = azurerm_resource_group.main.location
 
-  account_tier             = "Standard"
+  account_tier = "Standard"
 
   account_replication_type = "LRS"
 
@@ -68,15 +68,15 @@ resource "azurerm_storage_account" "main" {
 
 resource "azurerm_service_plan" "main" {
 
-  name                = "${local.prefix}-asp"
+  name = "${local.prefix}-asp"
 
   resource_group_name = azurerm_resource_group.main.name
 
-  location            = azurerm_resource_group.main.location
+  location = azurerm_resource_group.main.location
 
-  os_type            = "Linux"
+  os_type = "Linux"
 
-  sku_name            = "Y1"
+  sku_name = "Y1"
 
 }
 
@@ -84,17 +84,17 @@ resource "azurerm_service_plan" "main" {
 
 resource "azurerm_linux_function_app" "main" {
 
-  name                       = "${local.prefix}-function"
+  name = "${local.prefix}-function"
 
-  resource_group_name        = azurerm_resource_group.main.name
+  resource_group_name = azurerm_resource_group.main.name
 
-  location                   = azurerm_resource_group.main.location
+  location = azurerm_resource_group.main.location
 
 
 
-  service_plan_id            = azurerm_service_plan.main.id
+  service_plan_id = azurerm_service_plan.main.id
 
-  storage_account_name       = azurerm_storage_account.main.name
+  storage_account_name = azurerm_storage_account.main.name
 
   storage_account_access_key = azurerm_storage_account.main.primary_access_key
 
@@ -104,20 +104,20 @@ resource "azurerm_linux_function_app" "main" {
 
 }
 
-resource "azurerm_application_insights" "main" { 
+resource "azurerm_application_insights" "main" {
 
-  name                = "${local.prefix}-appinsights" 
+  name = "${local.prefix}-appinsights"
 
-  resource_group_name = azurerm_resource_group.main.name 
+  resource_group_name = azurerm_resource_group.main.name
 
-  location            = azurerm_resource_group.main.location 
+  location = azurerm_resource_group.main.location
 
-  application_type    = "web" 
+  application_type = "web"
 
-  app_settings = { 
+  app_settings = {
 
-    AppInsights_InstrumentationKey = azurerm_application_insights.main.instrumentation_key 
+    AppInsights_InstrumentationKey = azurerm_application_insights.main.instrumentation_key
 
-  } 
+  }
 
-} 
+}
